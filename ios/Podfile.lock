@@ -1,0 +1,39 @@
+PODS:
+  - audio_session (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - just_audio (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - path_provider_ios (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - audio_session (from `.symlinks/plugins/audio_session/ios`)
+  - FirebaseFirestore (from `https://github.com/invertase/firestore-ios-sdk-frameworks.git`, tag `8.15.0`)
+  - Flutter (from `Flutter`)
+  - just_audio (from `.symlinks/plugins/just_audio/darwin`)
+  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+
+EXTERNAL SOURCES:
+  audio_session:
+    :path: ".symlinks/plugins/audio_session/ios"
+  FirebaseFirestore:
+    :git: https://github.com/invertase/firestore-ios-sdk-frameworks.git
+    :tag: 8.15.0
+  Flutter:
+    :path: Flutter
+  just_audio:
+    :path: ".symlinks/plugins/just_audio/darwin"
+  path_provider_ios:
+    :path: ".symlinks/plugins/path_provider_ios/ios"
+
+SPEC CHECKSUMS:
+  audio_session: 19e9480dbdd4e5f6c4543826b2e8b0e4ab6145fe
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  just_audio: a42c63806f16995daf5b219ae1d679deb76e6a79
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
+
+PODFILE CHECKSUM: 96ea69212e905c0dd82eaeaaa9ddefdaa39cb6eb
+
+COCOAPODS: 1.16.2
