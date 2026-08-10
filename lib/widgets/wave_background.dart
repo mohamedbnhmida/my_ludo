@@ -104,7 +104,7 @@ class _Drop {
 
   _Drop(Random random)
       : xFraction = random.nextDouble(),
-        size = 7 + random.nextDouble() * 11,
+        size = 7 + random.nextDouble() * 10,
         speed = 0.5 + random.nextDouble() * 0.9,
         phase = random.nextDouble(),
         face = 1 + random.nextInt(6);
@@ -145,7 +145,7 @@ class _DiceFacePainter extends CustomPainter {
     // saveLayer is required for BlendMode.clear to only erase within this die's
     // own painted card, instead of punching through everything behind it.
     canvas.saveLayer(rect, Paint());
-    canvas.drawRRect(rrect, Paint()..color = Colors.white.withValues(alpha: 0.22));
+    canvas.drawRRect(rrect, Paint()..color = Colors.white.withValues(alpha: 0.1));
     final clearPaint = Paint()..blendMode = BlendMode.clear;
     for (final pip in _pipLayout[face] ?? const []) {
       canvas.drawCircle(Offset(pip.dx * size.width, pip.dy * size.height), pipRadius, clearPaint);

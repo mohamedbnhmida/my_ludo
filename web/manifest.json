@@ -1,6 +1,6 @@
 {
-    "name": "ludo_flutter",
-    "short_name": "ludo_flutter",
+    "name": "MyLudo",
+    "short_name": "MyLudo",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#04292A",
