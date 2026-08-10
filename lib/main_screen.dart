@@ -10,7 +10,9 @@ class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
 
   static const double _diceBadgeSize = 52;
-  static const double _chipHeight = 22;
+  static const double _avatarSize = 40;
+  static const double _chipPadding = 4; // padding around the avatar inside the pill
+  static const double _chipHeight = _avatarSize + _chipPadding * 2;
   static const double _chipGap = 4;
   static const double _gapToBoard = 6;
   static const double _bottomExtraPadding = 16; // extra breathing room below the board for the bottom dice
@@ -92,12 +94,12 @@ class MainScreen extends StatelessWidget {
     );
   }
 
-  ///Small avatar+name chip identifying a player: "Player" for the local human, "CPU" for bots.
+  ///A player's avatar (grey placeholder circle, like an unset profile photo) next to a
+  ///name label, both inside one colored pill: "Player" for the local human, "CPU" for bots.
   Widget _playerChip(Color color, bool isCpu) {
     return Container(
       height: _chipHeight,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      alignment: Alignment.center,
+      padding: const EdgeInsets.only(left: _chipPadding, right: 10, top: _chipPadding, bottom: _chipPadding),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(_chipHeight / 2),
@@ -107,9 +109,19 @@ class MainScreen extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(isCpu ? Icons.smart_toy_rounded : Icons.person_rounded, size: 12, color: Colors.white),
-          const SizedBox(width: 4),
-          Text(isCpu ? "CPU" : "Player", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+          Container(
+            width: _avatarSize,
+            height: _avatarSize,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.grey.shade400,
+              border: Border.all(color: Colors.white, width: 1.5),
+            ),
+            child: Icon(isCpu ? Icons.smart_toy_rounded : Icons.person_rounded, size: 26, color: Colors.grey.shade100),
+          ),
+          const SizedBox(width: 6),
+          Text(isCpu ? "CPU" : "Player", style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -137,20 +149,27 @@ class MainScreen extends StatelessWidget {
         child: Stack(
           children: [
             const Positioned.fill(child: WaveBackground()),
+            const Positioned.fill(child: DiceRain()),
             Center(
+              // BoardWidget adds its own `margin` on every side (for its shadow/rounded outer
+              // corner), so its true footprint is bigger than `ludoBoard()` alone reports — this
+              // box must span that full footprint or the board renders off-center (see `boardSize`).
               child: SizedBox(
-                width: BoardWidget.ludoBoard(context),
-                height: BoardWidget.ludoBoard(context) + _topBand + _bottomBand,
+                width: BoardWidget.ludoBoard(context) + BoardWidget.margin * 2,
+                height: BoardWidget.ludoBoard(context) + BoardWidget.margin * 2 + _topBand + _bottomBand,
                 child: Consumer<LudoProvider>(
-                  builder: (context, value, child) => Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      const Positioned(top: _topBand, left: 0, child: BoardWidget()),
-                      ...value.activePlayerTypes.map(
-                        (type) => _diceBadge(context, type, value.player(type).color, value.cpuTypes.contains(type), BoardWidget.ludoBoard(context)),
-                      ),
-                    ],
-                  ),
+                  builder: (context, value, child) {
+                    double boardSize = BoardWidget.ludoBoard(context) + BoardWidget.margin * 2;
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Positioned(top: _topBand, left: 0, child: BoardWidget()),
+                        ...value.activePlayerTypes.map(
+                          (type) => _diceBadge(context, type, value.player(type).color, value.cpuTypes.contains(type), boardSize),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),

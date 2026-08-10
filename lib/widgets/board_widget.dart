@@ -12,6 +12,11 @@ import '../ludo_player.dart';
 class BoardWidget extends StatelessWidget {
   const BoardWidget({super.key});
 
+  ///Margin around the colored board (for its shadow/rounded outer corner). Callers that
+  ///lay out siblings around the board need this to compute its true total footprint,
+  ///since `ludoBoard` only reports the inner colored-board size.
+  static const double margin = 10;
+
   ///Return board size
   static double ludoBoard(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -34,7 +39,7 @@ class BoardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(margin),
       clipBehavior: Clip.antiAlias,
       width: ludoBoard(context),
       height: ludoBoard(context),

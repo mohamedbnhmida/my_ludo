@@ -54,6 +54,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                 ),
               ),
               CustomPaint(painter: LudoWavePainter(_controller.value), size: Size.infinite),
+              const Positioned.fill(child: DiceRain()),
               child!,
             ],
           );
@@ -194,13 +195,13 @@ class _MenuContent extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-        decoration: AppTheme.bubbleDecoration(active: vsCpu, borderRadius: BorderRadius.circular(24)),
+        decoration: AppTheme.bubbleDecoration(active: !vsCpu, borderRadius: BorderRadius.circular(24)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.smart_toy_rounded, size: 18, color: vsCpu ? AppTheme.turquoiseDark : Colors.white),
+            Icon(Icons.smart_toy_rounded, size: 18, color: !vsCpu ? AppTheme.turquoiseDark : Colors.white),
             const SizedBox(width: 8),
-            Text("VS CPU", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1, color: vsCpu ? AppTheme.turquoiseDark : Colors.white)),
+            Text("VS CPU", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1, color: !vsCpu ? AppTheme.turquoiseDark : Colors.white)),
           ],
         ),
       ),

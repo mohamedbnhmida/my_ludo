@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:ludo_flutter/main_screen.dart'; 
+import 'package:ludo_flutter/menu_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'ludo_provider.dart';
@@ -40,9 +40,6 @@ class _RootState extends State<Root> {
         precacheImage(const AssetImage("assets/images/crown/3rd.png"), context),
       ]);
     });
-    // TEMP-VERIFY: must run before the first build, not in a postFrameCallback,
-    // since MainScreen reads `players` synchronously on its very first frame.
-    context.read<LudoProvider>().startGame(numberOfPlayers: 4, vsCpu: true);
     super.initState();
   }
 
@@ -50,7 +47,7 @@ class _RootState extends State<Root> {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainScreen(), // TEMP-VERIFY
+      home: MenuScreen(),
     );
   }
 }
