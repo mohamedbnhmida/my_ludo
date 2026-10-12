@@ -25,35 +25,34 @@ class LudoPlayer {
     }
 
     ///Initialize path
+    color = LudoColor.of(type);
     switch (type) {
       case LudoPlayerType.green:
         path = LudoPath.greenPath;
-        color = LudoColor.green;
         homePath = LudoPath.greenHomePath;
         break;
       case LudoPlayerType.yellow:
         path = LudoPath.yellowPath;
-        color = LudoColor.yellow;
         homePath = LudoPath.yellowHomePath;
         break;
       case LudoPlayerType.blue:
         path = LudoPath.bluePath;
-        color = LudoColor.blue;
         homePath = LudoPath.blueHomePath;
         break;
       case LudoPlayerType.red:
         path = LudoPath.redPath;
-        color = LudoColor.red;
         homePath = LudoPath.redHomePath;
         break;
     }
   }
 
   ///Get how many pawns are in the home
-  int get pawnInsideCount => pawns.where((element) => element.step == -1).length;
+  int get pawnInsideCount =>
+      pawns.where((element) => element.step == -1).length;
 
   ///Get how many pawns are outside home
-  int get pawnOutsideCount => pawns.where((element) => element.step > -1).length;
+  int get pawnOutsideCount =>
+      pawns.where((element) => element.step > -1).length;
 
   ///Moving mean you'll replace the current widget with the new widget
   void movePawn(int index, int step) async {
@@ -64,7 +63,8 @@ class LudoPlayer {
   void highlightPawn(int index, [bool highlight = true]) {
     var pawn = pawns[index];
     pawns.removeAt(index);
-    pawns.insert(index, PawnWidget(index, pawn.type, highlight: highlight, step: pawn.step));
+    pawns.insert(index,
+        PawnWidget(index, pawn.type, highlight: highlight, step: pawn.step));
   }
 
   ///Highlight all the pawns

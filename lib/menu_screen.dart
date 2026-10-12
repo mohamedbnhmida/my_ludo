@@ -5,8 +5,11 @@ import 'package:provider/provider.dart';
 
 import 'audio.dart';
 import 'constants.dart';
+import 'host_join_screen.dart';
 import 'ludo_provider.dart';
 import 'main_screen.dart';
+import 'profile_setup_screen.dart';
+import 'services/profile_service.dart';
 import 'widgets/wave_background.dart';
 
 ///Start menu shown when the app launches: pick sound, player count and CPU, then start.
@@ -17,8 +20,11 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(seconds: 8))..repeat();
+class _MenuScreenState extends State<MenuScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller =
+      AnimationController(vsync: this, duration: const Duration(seconds: 8))
+        ..repeat();
   bool _soundOn = !Audio.muted;
   int _playerCount = 4;
   bool _vsCpu = false;
@@ -31,8 +37,21 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
 
   void _start() {
     Audio.muted = !_soundOn;
-    context.read<LudoProvider>().startGame(numberOfPlayers: _playerCount, vsCpu: _vsCpu);
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MainScreen()));
+    context
+        .read<LudoProvider>()
+        .startGame(numberOfPlayers: _playerCount, vsCpu: _vsCpu);
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const MainScreen()));
+  }
+
+  Future<void> _playOnline() async {
+    final name = await ProfileService.loadName();
+    if (!mounted) return;
+    final needsProfile = name == null || name.trim().isEmpty;
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => needsProfile
+            ? const ProfileSetupScreen()
+            : const HostJoinScreen()));
   }
 
   @override
@@ -53,7 +72,9 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
                   ),
                 ),
               ),
-              CustomPaint(painter: LudoWavePainter(_controller.value), size: Size.infinite),
+              CustomPaint(
+                  painter: LudoWavePainter(_controller.value),
+                  size: Size.infinite),
               const Positioned.fill(child: DiceRain()),
               child!,
             ],
@@ -68,6 +89,7 @@ class _MenuScreenState extends State<MenuScreen> with SingleTickerProviderStateM
           onPlayerCountChanged: (n) => setState(() => _playerCount = n),
           onCpuToggle: () => setState(() => _vsCpu = !_vsCpu),
           onStart: _start,
+          onPlayOnline: _playOnline,
         ),
       ),
     );
@@ -83,6 +105,7 @@ class _MenuContent extends StatelessWidget {
   final ValueChanged<int> onPlayerCountChanged;
   final VoidCallback onCpuToggle;
   final VoidCallback onStart;
+  final VoidCallback onPlayOnline;
 
   const _MenuContent({
     required this.titleAnimation,
@@ -93,6 +116,7 @@ class _MenuContent extends StatelessWidget {
     required this.onPlayerCountChanged,
     required this.onCpuToggle,
     required this.onStart,
+    required this.onPlayOnline,
   });
 
   @override
@@ -110,7 +134,12 @@ class _MenuContent extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: AppTheme.bubbleDecoration(active: soundOn),
-                  child: Icon(soundOn ? Icons.volume_up_rounded : Icons.volume_off_rounded, color: soundOn ? AppTheme.turquoiseDark : Colors.white, size: 24),
+                  child: Icon(
+                      soundOn
+                          ? Icons.volume_up_rounded
+                          : Icons.volume_off_rounded,
+                      color: soundOn ? AppTheme.turquoiseDark : Colors.white,
+                      size: 24),
                 ),
               ),
             ),
@@ -122,15 +151,26 @@ class _MenuContent extends StatelessWidget {
                 children: [
                   _title(),
                   const SizedBox(height: 8),
-                  const Text("A classic board game", style: TextStyle(color: Colors.white70, fontSize: 14, letterSpacing: 1)),
+                  const Text("A classic board game",
+                      style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          letterSpacing: 1)),
                   const SizedBox(height: 48),
-                  const Text("PLAYERS", style: TextStyle(color: Colors.white70, fontSize: 13, letterSpacing: 2, fontWeight: FontWeight.bold)),
+                  const Text("PLAYERS",
+                      style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                          letterSpacing: 2,
+                          fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   _playerSelector(),
                   const SizedBox(height: 24),
                   _cpuToggle(),
                   const SizedBox(height: 40),
                   _startButton(),
+                  const SizedBox(height: 16),
+                  _playOnlineButton(),
                 ],
               ),
             ),
@@ -143,10 +183,16 @@ class _MenuContent extends StatelessWidget {
   ///Gently breathing logo, reusing the background's animation controller.
   Widget _title() {
     const letters = ["L", "U", "D", "O"];
-    const colors = [LudoColor.green, LudoColor.yellow, LudoColor.blue, LudoColor.red];
+    const colors = [
+      LudoColor.green,
+      LudoColor.yellow,
+      LudoColor.blue,
+      LudoColor.red
+    ];
     return AnimatedBuilder(
       animation: titleAnimation,
-      builder: (context, child) => Transform.scale(scale: 1 + 0.04 * sin(titleAnimation.value * 2 * pi), child: child),
+      builder: (context, child) => Transform.scale(
+          scale: 1 + 0.04 * sin(titleAnimation.value * 2 * pi), child: child),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: List.generate(
@@ -157,7 +203,10 @@ class _MenuContent extends StatelessWidget {
               fontSize: 56,
               fontWeight: FontWeight.w900,
               color: colors[i],
-              shadows: const [Shadow(color: Colors.black45, blurRadius: 8, offset: Offset(0, 3))],
+              shadows: const [
+                Shadow(
+                    color: Colors.black45, blurRadius: 8, offset: Offset(0, 3))
+              ],
             ),
           ),
         ),
@@ -181,7 +230,10 @@ class _MenuContent extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               "$n",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: selected ? AppTheme.turquoiseDark : Colors.white),
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: selected ? AppTheme.turquoiseDark : Colors.white),
             ),
           ),
         );
@@ -195,13 +247,20 @@ class _MenuContent extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-        decoration: AppTheme.bubbleDecoration(active: !vsCpu, borderRadius: BorderRadius.circular(24)),
+        decoration: AppTheme.bubbleDecoration(
+            active: !vsCpu, borderRadius: BorderRadius.circular(24)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.smart_toy_rounded, size: 18, color: !vsCpu ? AppTheme.turquoiseDark : Colors.white),
+            Icon(Icons.smart_toy_rounded,
+                size: 18,
+                color: !vsCpu ? AppTheme.turquoiseDark : Colors.white),
             const SizedBox(width: 8),
-            Text("VS CPU", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1, color: !vsCpu ? AppTheme.turquoiseDark : Colors.white)),
+            Text("VS CPU",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    color: !vsCpu ? AppTheme.turquoiseDark : Colors.white)),
           ],
         ),
       ),
@@ -213,8 +272,38 @@ class _MenuContent extends StatelessWidget {
       onTap: onStart,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 18),
-        decoration: AppTheme.bubbleDecoration(active: true, borderRadius: BorderRadius.circular(36)),
-        child: const Text("START GAME", style: TextStyle(color: AppTheme.turquoiseDark, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2)),
+        decoration: AppTheme.bubbleDecoration(
+            active: true, borderRadius: BorderRadius.circular(36)),
+        child: const Text("START GAME",
+            style: TextStyle(
+                color: AppTheme.turquoiseDark,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2)),
+      ),
+    );
+  }
+
+  Widget _playOnlineButton() {
+    return GestureDetector(
+      onTap: onPlayOnline,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+        decoration: AppTheme.bubbleDecoration(
+            active: false, borderRadius: BorderRadius.circular(32)),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.public_rounded, size: 18, color: Colors.white),
+            SizedBox(width: 8),
+            Text("PLAY ONLINE",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5)),
+          ],
+        ),
       ),
     );
   }

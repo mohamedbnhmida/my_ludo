@@ -3,6 +3,34 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:ludo_flutter/constants.dart';
 
+///The turquoise gradient + wave + dice-rain backdrop shared by the online-flow screens
+///(profile setup, host/join, lobby), wrapped in a `SafeArea` around `child`.
+class ScreenBackground extends StatelessWidget {
+  final Widget child;
+  const ScreenBackground({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: AppTheme.backgroundGradient),
+        ),
+        child: Stack(
+          children: [
+            const Positioned.fill(child: WaveBackground()),
+            const Positioned.fill(child: DiceRain()),
+            SafeArea(child: child),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 ///Self-ticking animated wave backdrop, shared by the menu and the game screen.
 class WaveBackground extends StatefulWidget {
   const WaveBackground({super.key});
@@ -11,8 +39,11 @@ class WaveBackground extends StatefulWidget {
   State<WaveBackground> createState() => _WaveBackgroundState();
 }
 
-class _WaveBackgroundState extends State<WaveBackground> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(seconds: 8))..repeat();
+class _WaveBackgroundState extends State<WaveBackground>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller =
+      AnimationController(vsync: this, duration: const Duration(seconds: 8))
+        ..repeat();
 
   @override
   void dispose() {
@@ -24,7 +55,8 @@ class _WaveBackgroundState extends State<WaveBackground> with SingleTickerProvid
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
-      builder: (context, child) => CustomPaint(painter: LudoWavePainter(_controller.value), size: Size.infinite),
+      builder: (context, child) => CustomPaint(
+          painter: LudoWavePainter(_controller.value), size: Size.infinite),
     );
   }
 }
@@ -36,19 +68,37 @@ class LudoWavePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    _drawWave(canvas, size, color: AppTheme.turquoiseLight.withValues(alpha: 0.35), heightFactor: 0.16, phase: t * 2 * pi, speed: 1);
-    _drawWave(canvas, size, color: AppTheme.turquoiseMid.withValues(alpha: 0.45), heightFactor: 0.11, phase: t * 2 * pi + pi / 2, speed: 1.3);
-    _drawWave(canvas, size, color: AppTheme.turquoiseDark.withValues(alpha: 0.6), heightFactor: 0.08, phase: t * 2 * pi + pi, speed: 0.8);
+    _drawWave(canvas, size,
+        color: AppTheme.turquoiseLight.withValues(alpha: 0.35),
+        heightFactor: 0.16,
+        phase: t * 2 * pi,
+        speed: 1);
+    _drawWave(canvas, size,
+        color: AppTheme.turquoiseMid.withValues(alpha: 0.45),
+        heightFactor: 0.11,
+        phase: t * 2 * pi + pi / 2,
+        speed: 1.3);
+    _drawWave(canvas, size,
+        color: AppTheme.turquoiseDark.withValues(alpha: 0.6),
+        heightFactor: 0.08,
+        phase: t * 2 * pi + pi,
+        speed: 0.8);
   }
 
-  void _drawWave(Canvas canvas, Size size, {required Color color, required double heightFactor, required double phase, required double speed}) {
+  void _drawWave(Canvas canvas, Size size,
+      {required Color color,
+      required double heightFactor,
+      required double phase,
+      required double speed}) {
     final paint = Paint()..color = color;
     final path = Path();
     final baseHeight = size.height * (1 - heightFactor);
     path.moveTo(0, size.height);
     path.lineTo(0, baseHeight);
     for (double x = 0; x <= size.width; x += 4) {
-      final y = baseHeight + sin((x / size.width * 2 * pi * speed) + phase) * (size.height * heightFactor * 0.5);
+      final y = baseHeight +
+          sin((x / size.width * 2 * pi * speed) + phase) *
+              (size.height * heightFactor * 0.5);
       path.lineTo(x, y);
     }
     path.lineTo(size.width, size.height);
@@ -57,7 +107,8 @@ class LudoWavePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant LudoWavePainter oldDelegate) => oldDelegate.t != t;
+  bool shouldRepaint(covariant LudoWavePainter oldDelegate) =>
+      oldDelegate.t != t;
 }
 
 ///Small white semi-transparent dice, each falling straight down and looping back to the
@@ -69,8 +120,11 @@ class DiceRain extends StatefulWidget {
   State<DiceRain> createState() => _DiceRainState();
 }
 
-class _DiceRainState extends State<DiceRain> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(seconds: 14))..repeat();
+class _DiceRainState extends State<DiceRain>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller =
+      AnimationController(vsync: this, duration: const Duration(seconds: 14))
+        ..repeat();
   final List<_Drop> _drops = List.generate(16, (i) => _Drop(Random(i * 7919)));
 
   @override
@@ -86,7 +140,9 @@ class _DiceRainState extends State<DiceRain> with SingleTickerProviderStateMixin
         animation: _controller,
         builder: (context, child) => LayoutBuilder(
           builder: (context, constraints) => Stack(
-            children: _drops.map((drop) => drop.build(constraints, _controller.value)).toList(),
+            children: _drops
+                .map((drop) => drop.build(constraints, _controller.value))
+                .toList(),
           ),
         ),
       ),
@@ -116,7 +172,8 @@ class _Drop {
     return Positioned(
       top: top,
       left: left,
-      child: CustomPaint(size: Size.square(size), painter: _DiceFacePainter(face: face)),
+      child: CustomPaint(
+          size: Size.square(size), painter: _DiceFacePainter(face: face)),
     );
   }
 }
@@ -131,28 +188,50 @@ class _DiceFacePainter extends CustomPainter {
     1: [Offset(0.5, 0.5)],
     2: [Offset(0.25, 0.25), Offset(0.75, 0.75)],
     3: [Offset(0.25, 0.25), Offset(0.5, 0.5), Offset(0.75, 0.75)],
-    4: [Offset(0.25, 0.25), Offset(0.75, 0.25), Offset(0.25, 0.75), Offset(0.75, 0.75)],
-    5: [Offset(0.25, 0.25), Offset(0.75, 0.25), Offset(0.5, 0.5), Offset(0.25, 0.75), Offset(0.75, 0.75)],
-    6: [Offset(0.25, 0.25), Offset(0.75, 0.25), Offset(0.25, 0.5), Offset(0.75, 0.5), Offset(0.25, 0.75), Offset(0.75, 0.75)],
+    4: [
+      Offset(0.25, 0.25),
+      Offset(0.75, 0.25),
+      Offset(0.25, 0.75),
+      Offset(0.75, 0.75)
+    ],
+    5: [
+      Offset(0.25, 0.25),
+      Offset(0.75, 0.25),
+      Offset(0.5, 0.5),
+      Offset(0.25, 0.75),
+      Offset(0.75, 0.75)
+    ],
+    6: [
+      Offset(0.25, 0.25),
+      Offset(0.75, 0.25),
+      Offset(0.25, 0.5),
+      Offset(0.75, 0.5),
+      Offset(0.25, 0.75),
+      Offset(0.75, 0.75)
+    ],
   };
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
-    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(size.shortestSide * 0.2));
+    final rrect =
+        RRect.fromRectAndRadius(rect, Radius.circular(size.shortestSide * 0.2));
     final pipRadius = size.shortestSide * 0.1;
 
     // saveLayer is required for BlendMode.clear to only erase within this die's
     // own painted card, instead of punching through everything behind it.
     canvas.saveLayer(rect, Paint());
-    canvas.drawRRect(rrect, Paint()..color = Colors.white.withValues(alpha: 0.1));
+    canvas.drawRRect(
+        rrect, Paint()..color = Colors.white.withValues(alpha: 0.1));
     final clearPaint = Paint()..blendMode = BlendMode.clear;
     for (final pip in _pipLayout[face] ?? const []) {
-      canvas.drawCircle(Offset(pip.dx * size.width, pip.dy * size.height), pipRadius, clearPaint);
+      canvas.drawCircle(Offset(pip.dx * size.width, pip.dy * size.height),
+          pipRadius, clearPaint);
     }
     canvas.restore();
   }
 
   @override
-  bool shouldRepaint(covariant _DiceFacePainter oldDelegate) => oldDelegate.face != face;
+  bool shouldRepaint(covariant _DiceFacePainter oldDelegate) =>
+      oldDelegate.face != face;
 }

@@ -20,19 +20,29 @@ class DiceWidget extends StatelessWidget {
           return IgnorePointer(
             child: Opacity(
               opacity: 0.6,
-              child: Image.asset("assets/images/dice/1.png", fit: BoxFit.contain),
+              child:
+                  Image.asset("assets/images/dice/1.png", fit: BoxFit.contain),
             ),
           );
         }
         return RippleAnimation(
-          color: value.gameState == LudoGameState.throwDice ? value.currentPlayer.color : Colors.white.withValues(alpha: 0),
+          color: value.gameState == LudoGameState.throwDice
+              ? value.currentPlayer.color
+              : Colors.white.withValues(alpha: 0),
           ripplesCount: 3,
           minRadius: 30,
           repeat: true,
           child: CupertinoButton(
-            onPressed: value.cpuTypes.contains(value.currentPlayer.type) ? null : value.throwDice,
+            onPressed: (value.cpuTypes.contains(value.currentPlayer.type) ||
+                    !value.isMyTurn)
+                ? null
+                : value.throwDice,
             padding: const EdgeInsets.only(),
-            child: value.diceStarted ? Image.asset("assets/images/dice/draw.gif", fit: BoxFit.contain) : Image.asset("assets/images/dice/${value.diceResult}.png", fit: BoxFit.contain),
+            child: value.diceStarted
+                ? Image.asset("assets/images/dice/draw.gif",
+                    fit: BoxFit.contain)
+                : Image.asset("assets/images/dice/${value.diceResult}.png",
+                    fit: BoxFit.contain),
           ),
         );
       },

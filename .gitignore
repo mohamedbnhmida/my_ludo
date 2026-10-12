@@ -9,8 +9,6 @@
 .history
 .svn/
 .firebase
-.firebaserc
-firebase.json
 .vscode
 migrate_working_dir/
  
@@ -50,3 +48,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase client config: generate locally with `flutterfire configure` (kept out of the public repo)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+lib/firebase_options.dart
+
+# Local marketing sources
+/marketing/

@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "rooms": {
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        "players": {
+          "$uid": {
+            "name": {
+              ".validate": "newData.isString() && newData.val().length <= 30"
+            },
+            "photoBase64": {
+              ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 200000)"
+            },
+            "colorType": {
+              ".validate": "newData.isString()"
+            }
+          }
+        },
+        "game": {
+          "diceResult": {
+            ".validate": "newData.isNumber()"
+          }
+        }
+      }
+    }
+  }
+}

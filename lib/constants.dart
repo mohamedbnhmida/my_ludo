@@ -10,6 +10,13 @@ class LudoColor {
   static const Color yellow = Color(0xFFffcd1d);
   static const Color blue = Color(0xFF4a5fd1);
   static const Color red = Color(0xFFf84700);
+
+  static Color of(LudoPlayerType type) => switch (type) {
+        LudoPlayerType.green => green,
+        LudoPlayerType.yellow => yellow,
+        LudoPlayerType.blue => blue,
+        LudoPlayerType.red => red,
+      };
 }
 
 ///Shared turquoise theme used by the menu and the in-game background
@@ -21,7 +28,8 @@ class AppTheme {
   static const List<Color> backgroundGradient = [turquoiseDark, turquoiseMid];
 
   ///Glossy "bubble" fill used by circular/pill buttons
-  static BoxDecoration bubbleDecoration({required bool active, BorderRadius? borderRadius}) {
+  static BoxDecoration bubbleDecoration(
+      {required bool active, BorderRadius? borderRadius}) {
     return BoxDecoration(
       shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
       borderRadius: borderRadius,
@@ -30,10 +38,19 @@ class AppTheme {
         radius: 1,
         colors: active
             ? const [Colors.white, turquoiseLight, turquoiseMid]
-            : [Colors.white.withValues(alpha: 0.35), turquoiseMid.withValues(alpha: 0.55), turquoiseDark.withValues(alpha: 0.65)],
+            : [
+                Colors.white.withValues(alpha: 0.35),
+                turquoiseMid.withValues(alpha: 0.55),
+                turquoiseDark.withValues(alpha: 0.65)
+              ],
         stops: const [0, 0.5, 1],
       ),
-      boxShadow: [BoxShadow(color: turquoiseDark.withValues(alpha: 0.5), blurRadius: 10, offset: const Offset(0, 4))],
+      boxShadow: [
+        BoxShadow(
+            color: turquoiseDark.withValues(alpha: 0.5),
+            blurRadius: 10,
+            offset: const Offset(0, 4))
+      ],
     );
   }
 }
@@ -60,6 +77,17 @@ class LudoPath {
         return (0, 1);
     }
   }
+
+  ///Corners in clockwise order starting top-left; this matches `LudoPlayerType`'s enum
+  ///order (green, yellow, blue, red), which is what makes `rotationSteps`/`viewCorner` below work.
+  static const List<(int, int)> _cornerOrder = [(0, 0), (1, 0), (1, 1), (0, 1)];
+
+  ///How many 90°-clockwise turns the board needs so `viewer`'s home ends up bottom-left (red's slot).
+  static int rotationSteps(LudoPlayerType viewer) => (3 - viewer.index) % 4;
+
+  ///Where `type`'s home square appears on screen once the board is rotated to put `viewer` bottom-left.
+  static (int x, int y) viewCorner(LudoPlayerType type, LudoPlayerType viewer) =>
+      _cornerOrder[(type.index + rotationSteps(viewer)) % 4];
 
   ///Safe path that is the path where the pawns can move without getting killed
   static const List<List<double>> safeArea = [

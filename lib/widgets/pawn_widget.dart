@@ -11,25 +11,12 @@ class PawnWidget extends StatelessWidget {
   final int step;
   final bool highlight;
 
-  const PawnWidget(this.index, this.type, {super.key, this.highlight = false, this.step = -1});
+  const PawnWidget(this.index, this.type,
+      {super.key, this.highlight = false, this.step = -1});
 
   @override
   Widget build(BuildContext context) {
-    Color color = Colors.white;
-    switch (type) {
-      case LudoPlayerType.green:
-        color = LudoColor.green;
-        break;
-      case LudoPlayerType.yellow:
-        color = LudoColor.yellow;
-        break;
-      case LudoPlayerType.blue:
-        color = LudoColor.blue;
-        break;
-      case LudoPlayerType.red:
-        color = LudoColor.red;
-        break;
-    }
+    Color color = LudoColor.of(type);
     return IgnorePointer(
       ignoring: !highlight,
       child: Stack(
@@ -45,17 +32,20 @@ class PawnWidget extends StatelessWidget {
             ),
           Consumer<LudoProvider>(
             builder: (context, provider, child) => IgnorePointer(
-              ignoring: provider.cpuTypes.contains(type),
+              ignoring: provider.cpuTypes.contains(type) || !provider.isMyTurn,
               child: GestureDetector(
                 onTap: () {
                   if (step == -1) {
                     provider.move(type, index, (step + 1) + 1);
                   } else {
-                    provider.move(type, index, (step + 1) + provider.diceResult);
+                    provider.move(
+                        type, index, (step + 1) + provider.diceResult);
                   }
                 },
                 child: Container(
-                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: color, width: 2)),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: color, width: 2)),
                   child: Container(
                     decoration: BoxDecoration(
                       color: color,
